@@ -1,13 +1,14 @@
 services:
   app:
     build:
-      context: .
+      context: ../
       dockerfile: Dockerfile
     container_name: finance-app
     restart: unless-stopped
     ports:
       - "80:80"
     environment:
+      - APP_NAME=${APP_NAME}
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY}

@@ -70,7 +70,6 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
         $categories = Category::where('user_id', auth()->id())
             ->whereIn('type', ['expense', 'income'])
             ->orderBy('name')
@@ -80,7 +79,6 @@ class TransactionController extends Controller
 
     public function update(Request $request, Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'type' => 'required|in:expense,income',
@@ -97,7 +95,6 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
         $transaction->delete();
 
         return redirect()->route('transactions.index')
