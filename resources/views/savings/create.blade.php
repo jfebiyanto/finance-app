@@ -16,7 +16,10 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Initial Deposit (Rp)</label>
-                            <input type="number" step="0.01" min="0" name="amount_invested" value="{{ old('amount_invested') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" required>
+                            <input type="number" step="0.01" min="0" name="amount_invested" id="amount_invested" value="{{ old('amount_invested') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                oninput="clearForeignCalc()">
+                            <p class="text-xs text-gray-400 mt-1">Auto-calculated when foreign currency is filled below.</p>
                             @error('amount_invested') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
@@ -32,7 +35,7 @@
                         <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Currency</label>
-                                <select name="currency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                                <select name="currency" id="currency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" onchange="autoCalcIdr()">
                                     <option value="">-- Select --</option>
                                     <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
                                     <option value="SGD" {{ old('currency') == 'SGD' ? 'selected' : '' }}>SGD</option>
@@ -46,15 +49,39 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Exchange Rate (1 to IDR)</label>
-                                <input type="number" step="0.01" min="0" name="exchange_rate" value="{{ old('exchange_rate') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="e.g. 15000">
+                                <input type="number" step="0.01" min="0" name="exchange_rate" id="exchange_rate" value="{{ old('exchange_rate') }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="e.g. 15000" oninput="autoCalcIdr()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Amount in Foreign Currency</label>
-                                <input type="number" step="0.01" min="0" name="amount_invested_foreign" value="{{ old('amount_invested_foreign') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="e.g. 1000">
+                                <input type="number" step="0.01" min="0" name="amount_invested_foreign" id="amount_invested_foreign" value="{{ old('amount_invested_foreign') }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="e.g. 1000" oninput="autoCalcIdr()">
                             </div>
                         </div>
                         <p class="text-xs text-blue-500 mt-2">Initial Deposit (IDR) will be auto-calculated as Foreign Amount × Exchange Rate.</p>
                     </div>
+
+                    <script>
+                    function autoCalcIdr() {
+                        const rate = parseFloat(document.getElementById('exchange_rate').value);
+                        const foreign = parseFloat(document.getElementById('amount_invested_foreign').value);
+                        const currency = document.getElementById('currency').value;
+                        if (currency && rate > 0 && foreign > 0) {
+                            document.getElementById('amount_invested').value = (foreign * rate).toFixed(2);
+                            document.getElementById('amount_invested').readOnly = true;
+                        } else {
+                            document.getElementById('amount_invested').readOnly = false;
+                        }
+                    }
+                    function clearForeignCalc() {
+                        // Allow manual entry if user edits IDR directly
+                        document.getElementById('amount_invested').readOnly = false;
+                    }
+                    // Run on load for old() values
+                    autoCalcIdr();
+                    </script>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Deposit Date</label>
                         <input type="date" name="purchase_date" value="{{ old('purchase_date', date('Y-m-d')) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">

@@ -43,6 +43,13 @@
                     </div>
 
                     <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Payee <span class="text-gray-400 font-normal">(optional)</span></label>
+                        <input type="text" name="payee" value="{{ old('payee', $transaction->payee) }}" placeholder="e.g. Starbucks, Alfamart, Gojek"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        @error('payee') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Description</label>
                         <input type="text" name="description" value="{{ old('description', $transaction->description) }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">

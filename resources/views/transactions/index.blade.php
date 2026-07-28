@@ -59,6 +59,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payee</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -73,6 +74,7 @@
                                             {{ $transaction->category->name ?? 'N/A' }}
                                         </span>
                                     </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">{{ $transaction->payee ?: '-' }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $transaction->description ?: '-' }}</td>
                                     <td class="px-6 py-4 text-sm font-semibold text-right {{ $transaction->type == 'income' ? 'text-green-600' : 'text-red-600' }}">
                                         {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}

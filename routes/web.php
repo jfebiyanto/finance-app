@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Savings
     Route::resource('savings', SavingsController::class)->parameters(['savings' => 'saving']);
+    Route::post('/savings/{saving}/top-up', [SavingsController::class, 'topUp'])->name('savings.topUp');
+    Route::post('/savings/{saving}/withdraw', [SavingsController::class, 'withdraw'])->name('savings.withdraw');
 
     // Budgets
     Route::resource('budgets', BudgetController::class);

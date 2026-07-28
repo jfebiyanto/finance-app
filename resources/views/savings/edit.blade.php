@@ -15,7 +15,10 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Initial Deposit (Rp)</label>
-                            <input type="number" step="0.01" min="0" name="amount_invested" value="{{ old('amount_invested', $saving->amount_invested) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <input type="number" step="0.01" min="0" name="amount_invested" id="edit_amount_invested" value="{{ old('amount_invested', $saving->amount_invested) }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                oninput="clearEditForeignCalc()">
+                            <p class="text-xs text-gray-400 mt-1">Auto-calculated when foreign currency is filled below.</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Annual Interest Rate (%)</label>
@@ -29,7 +32,7 @@
                         <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Currency</label>
-                                <select name="currency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                                <select name="currency" id="edit_currency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" onchange="editAutoCalcIdr()">
                                     <option value="">-- Select --</option>
                                     <option value="USD" {{ old('currency', $saving->currency) == 'USD' ? 'selected' : '' }}>USD</option>
                                     <option value="SGD" {{ old('currency', $saving->currency) == 'SGD' ? 'selected' : '' }}>SGD</option>
@@ -43,17 +46,39 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Exchange Rate (1 to IDR)</label>
-                                <input type="number" step="0.01" min="0" name="exchange_rate" value="{{ old('exchange_rate', $saving->exchange_rate) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="e.g. 15000">
+                                <input type="number" step="0.01" min="0" name="exchange_rate" id="edit_exchange_rate" value="{{ old('exchange_rate', $saving->exchange_rate) }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="e.g. 15000" oninput="editAutoCalcIdr()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Amount in Foreign Currency</label>
-                                <input type="number" step="0.01" min="0" name="amount_invested_foreign" value="{{ old('amount_invested_foreign', $saving->amount_invested_foreign) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="e.g. 1000">
+                                <input type="number" step="0.01" min="0" name="amount_invested_foreign" id="edit_amount_invested_foreign" value="{{ old('amount_invested_foreign', $saving->amount_invested_foreign) }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="e.g. 1000" oninput="editAutoCalcIdr()">
                             </div>
                         </div>
                         @if($saving->currency && $saving->amount_invested_foreign)
                             <p class="text-xs text-blue-500 mt-2">Deposited: {{ number_format($saving->amount_invested_foreign, 2) }} {{ $saving->currency }} @ {{ number_format($saving->exchange_rate, 0) }} = Rp {{ number_format($saving->amount_invested, 0, ',', '.') }}</p>
                         @endif
                     </div>
+
+                    <script>
+                    function editAutoCalcIdr() {
+                        const rate = parseFloat(document.getElementById('edit_exchange_rate').value);
+                        const foreign = parseFloat(document.getElementById('edit_amount_invested_foreign').value);
+                        const currency = document.getElementById('edit_currency').value;
+                        if (currency && rate > 0 && foreign > 0) {
+                            document.getElementById('edit_amount_invested').value = (foreign * rate).toFixed(2);
+                            document.getElementById('edit_amount_invested').readOnly = true;
+                        } else {
+                            document.getElementById('edit_amount_invested').readOnly = false;
+                        }
+                    }
+                    function clearEditForeignCalc() {
+                        document.getElementById('edit_amount_invested').readOnly = false;
+                    }
+                    editAutoCalcIdr();
+                    </script>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Notes</label>
                         <textarea name="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">{{ old('notes', $saving->notes) }}</textarea>

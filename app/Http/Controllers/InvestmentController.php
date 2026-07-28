@@ -224,8 +224,8 @@ class InvestmentController extends Controller
         // Update current_value if provided
         if (!empty($validated['new_current_value'])) {
             $investment->current_value = (float) $validated['new_current_value'];
-        } elseif ($investment->current_price && $investment->shares > 0) {
-            $investment->current_value = round((float) $investment->shares * (float) $investment->current_price, 2);
+        } elseif ($investment->avg_cost && $investment->shares > 0) {
+            $investment->current_value = round((float) $investment->shares * (float) $investment->avg_cost + $additionalAmount, 2);
         } else {
             $investment->current_value = round((float) $investment->current_value + $additionalAmount, 2);
         }

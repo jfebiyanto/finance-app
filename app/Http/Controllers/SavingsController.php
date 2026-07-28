@@ -45,8 +45,8 @@ class SavingsController extends Controller
         $validated['user_id'] = auth()->id();
         $validated['current_value'] = 0;
 
-        // Auto-calculate IDR amount from foreign currency
-        if (!empty($validated['amount_invested_foreign']) && !empty($validated['exchange_rate']) && empty($validated['amount_invested'])) {
+        // Auto-calculate IDR amount from foreign currency (always when foreign data is present)
+        if (!empty($validated['amount_invested_foreign']) && !empty($validated['exchange_rate'])) {
             $validated['amount_invested'] = round((float) $validated['amount_invested_foreign'] * (float) $validated['exchange_rate'], 2);
         }
 
@@ -91,8 +91,8 @@ class SavingsController extends Controller
         $purchaseDate = $validated['purchase_date'] ?? $saving->purchase_date;
         $rate = $validated['interest_rate'] ?? $saving->interest_rate;
 
-        // Auto-calculate IDR amount from foreign currency
-        if (!empty($validated['amount_invested_foreign']) && !empty($validated['exchange_rate']) && empty($validated['amount_invested'])) {
+        // Auto-calculate IDR amount from foreign currency (always when foreign data is present)
+        if (!empty($validated['amount_invested_foreign']) && !empty($validated['exchange_rate'])) {
             $validated['amount_invested'] = round((float) $validated['amount_invested_foreign'] * (float) $validated['exchange_rate'], 2);
         }
 
@@ -108,6 +108,69 @@ class SavingsController extends Controller
 
         return redirect()->route('savings.index')
             ->with('success', 'Savings updated successfully.');
+    }
+
+    public function topUp(Request $request, Saving $saving)
+    {
+        if ($saving->user_id !== auth()->id()) abort(403);
+
+        $validated = $request->validate([
+            'additional_amount' => 'required|numeric|min:0.01',
+            'additional_foreign_amount' => 'nullable|numeric|min:0',
+            'new_exchange_rate' => 'nullable|numeric|min:0',
+        ]);
+
+        $additionalAmount = (float) $validated['additional_amount'];
+
+        $updateData = [];
+
+        // Auto-calc additional IDR from foreign if provided
+        if (!empty($validated['additional_foreign_amount']) && !empty($validated['new_exchange_rate'])) {
+            $additionalAmount = round((float) $validated['additional_foreign_amount'] * (float) $validated['new_exchange_rate'], 2);
+            $updateData['amount_invested_foreign'] = round(((float) ($saving->amount_invested_foreign ?? 0)) + (float) $validated['additional_foreign_amount'], 2);
+            $updateData['exchange_rate'] = (float) $validated['new_exchange_rate'];
+        }
+
+        $updateData['amount_invested'] = round(((float) $saving->amount_invested) + $additionalAmount, 2);
+        $updateData['current_value'] = round(((float) $saving->current_value) + $additionalAmount, 2);
+
+        $saving->update($updateData);
+        $this->syncTargetAmount($saving);
+
+        return redirect()->route('savings.index')
+            ->with('success', 'Savings topped up successfully.');
+    }
+
+    public function withdraw(Request $request, Saving $saving)
+    {
+        if ($saving->user_id !== auth()->id()) abort(403);
+
+        $validated = $request->validate([
+            'withdraw_amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $withdrawAmount = (float) $validated['withdraw_amount'];
+
+        if ($withdrawAmount > (float) $saving->current_value) {
+            return back()->withErrors(['withdraw_amount' => 'Withdrawal amount exceeds current value.']);
+        }
+
+        $updateData = [];
+
+        // Proportional foreign amount reduction
+        if ((float) $saving->amount_invested > 0 && (float) ($saving->amount_invested_foreign ?? 0) > 0) {
+            $ratio = $withdrawAmount / (float) $saving->amount_invested;
+            $updateData['amount_invested_foreign'] = round(((float) $saving->amount_invested_foreign) - ((float) $saving->amount_invested_foreign * $ratio), 2);
+        }
+
+        $updateData['amount_invested'] = round(((float) $saving->amount_invested) - $withdrawAmount, 2);
+        $updateData['current_value'] = round(((float) $saving->current_value) - $withdrawAmount, 2);
+
+        $saving->update($updateData);
+        $this->syncTargetAmount($saving);
+
+        return redirect()->route('savings.index')
+            ->with('success', 'Withdrawal successful.');
     }
 
     public function destroy(Saving $saving)

@@ -19,6 +19,15 @@
             @if(session('success'))
                 <div class="mb-4 px-4 py-3 bg-green-100 border border-green-400 text-green-700 rounded">{{ session('success') }}</div>
             @endif
+            @if($errors->any())
+                <div class="mb-4 px-4 py-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <ul class="list-disc list-inside text-sm">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -68,8 +77,6 @@
                                     <td class="px-6 py-4">
                                         @if($investment->status === 'sold')
                                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-500">{{ ucfirst(str_replace('_', ' ', $investment->type)) }}</span>
-                                        @elseif($investment->isTermDeposit())
-                                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Term Deposit</span>
                                         @elseif($investment->isTermDeposit())
                                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Term Deposit</span>
                                         @else

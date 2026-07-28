@@ -58,6 +58,7 @@ class TransactionController extends Controller
             'type' => 'required|in:expense,income',
             'amount' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:255',
+            'payee' => 'nullable|string|max:255',
             'transaction_date' => 'required|date',
         ]);
 
@@ -84,6 +85,7 @@ class TransactionController extends Controller
             'type' => 'required|in:expense,income',
             'amount' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:255',
+            'payee' => 'nullable|string|max:255',
             'transaction_date' => 'required|date',
         ]);
 
