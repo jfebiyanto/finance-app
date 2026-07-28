@@ -15,8 +15,10 @@ fi
 # Run migrations
 php /var/www/html/artisan migrate --force
 
-# Seed database (use firstOrCreate in seeder to handle re-runs safely)
-php /var/www/html/artisan db:seed --force || true
+# Seed database only in non-production environments
+if [ "$APP_ENV" != "production" ]; then
+    php /var/www/html/artisan db:seed --force || true
+fi
 
 # Cache for performance (skip in dev mode for live code sync)
 if [ "$APP_ENV" != "local" ]; then

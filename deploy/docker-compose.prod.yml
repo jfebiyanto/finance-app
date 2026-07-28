@@ -5,8 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: finance-app
     restart: unless-stopped
-    ports:
-      - "80:80"
+    # No ports exposed to host — app is accessed only via Cloudflare Tunnel
     environment:
       - APP_NAME=${APP_NAME}
       - APP_ENV=production
@@ -29,9 +28,20 @@ services:
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
       - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - TRUSTED_PROXIES=*  # Trust Cloudflare IPs
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - finance-network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: finance-tunnel
+    restart: unless-stopped
+    command: tunnel --url http://app:80
+    depends_on:
+      - app
     networks:
       - finance-network
 
@@ -39,8 +49,9 @@ services:
     image: mysql:8.0
     container_name: finance-db
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:3306:3306"
+    # Only accessible from within the Docker network — no host port exposure
+    expose:
+      - "3306"
     environment:
       MYSQL_DATABASE: finance_app
       MYSQL_USER: finance_user

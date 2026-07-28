@@ -16,13 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrCreate(
-            ['email' => 'demo@finance.app'],
-            [
-                'name' => 'Demo User',
-                'password' => bcrypt('password'),
-            ]
-        );
+        // Only create demo user in local/dev environments, never in production
+        if (!app()->environment('production')) {
+            User::firstOrCreate(
+                ['email' => 'demo@finance.app'],
+                [
+                    'name' => 'Demo User',
+                    'password' => bcrypt('password'),
+                ]
+            );
+        }
 
         $this->call([
             CategorySeeder::class,
