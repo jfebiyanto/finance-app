@@ -50,9 +50,9 @@ class SavingsController extends Controller
             $validated['amount_invested'] = round((float) $validated['amount_invested_foreign'] * (float) $validated['exchange_rate'], 2);
         }
 
-        if (!empty($validated['purchase_date']) && !empty($validated['interest_rate']) && !empty($validated['amount_invested'])) {
+        if (!empty($validated['purchase_date']) && !empty($validated['amount_invested'])) {
             $principal = (float) $validated['amount_invested'];
-            $rate = (float) $validated['interest_rate'];
+            $rate = (float) ($validated['interest_rate'] ?? 0);
             $days = now()->diffInDays(\Carbon\Carbon::parse($validated['purchase_date']));
             $grossInterest = $principal * ($rate / 100) * ($days / 365);
             $validated['current_value'] = round($principal + ($grossInterest * 0.8), 2);
@@ -96,10 +96,11 @@ class SavingsController extends Controller
             $validated['amount_invested'] = round((float) $validated['amount_invested_foreign'] * (float) $validated['exchange_rate'], 2);
         }
 
-        if ($purchaseDate && $rate && !empty($validated['amount_invested'] ?? $saving->amount_invested)) {
+        if (!empty($purchaseDate) && !empty($validated['amount_invested'] ?? $saving->amount_invested)) {
             $principal = (float) ($validated['amount_invested'] ?? $saving->amount_invested);
+            $rateVal = (float) ($rate ?? 0);
             $days = now()->diffInDays(\Carbon\Carbon::parse($purchaseDate));
-            $grossInterest = $principal * ((float) $rate / 100) * ($days / 365);
+            $grossInterest = $principal * ($rateVal / 100) * ($days / 365);
             $validated['current_value'] = round($principal + ($grossInterest * 0.8), 2);
         }
 
