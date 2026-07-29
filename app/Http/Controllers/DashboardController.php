@@ -19,6 +19,17 @@ class DashboardController extends Controller
         $user = auth()->user();
         $month = $request->get('month', now()->format('Y-m'));
 
+        // Today's summary
+        $todayExpenses = Transaction::where('user_id', $user->id)
+            ->where('type', 'expense')
+            ->whereDate('transaction_date', today())
+            ->sum('amount');
+
+        $todayIncome = Transaction::where('user_id', $user->id)
+            ->where('type', 'income')
+            ->whereDate('transaction_date', today())
+            ->sum('amount');
+
         // Monthly summary
         $monthlyExpenses = Transaction::where('user_id', $user->id)
             ->where('type', 'expense')
@@ -111,6 +122,7 @@ class DashboardController extends Controller
 
         return view('dashboard', compact(
             'month', 'monthlyExpenses', 'monthlyIncome',
+            'todayExpenses', 'todayIncome',
             'recentTransactions', 'expensesByCategory',
             'budgets', 'totalDebt', 'totalInvested',
             'totalCurrentValue', 'targets', 'dailyExpenses',

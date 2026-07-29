@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Expense Report</title>
+    <title>Your Daily Expense Report</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -107,7 +107,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Daily Expense Report</h1>
+            <h1>📊 Your Daily Expense Report</h1>
             <p>{{ now()->format('l, d F Y') }}</p>
         </div>
         <div class="body">
@@ -143,7 +143,7 @@
                 </div>
             @else
                 <div class="no-expenses">
-                    🎉 No expenses recorded today!
+                    🎉 Great job! No expenses recorded today!
                 </div>
             @endif
         </div>
