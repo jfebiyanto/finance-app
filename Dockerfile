@@ -1,6 +1,6 @@
 FROM php:8.4-fpm-alpine
 
-# System dependencies
+# 1. System dependencies (rarely change -> cached across builds)
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -14,28 +14,34 @@ RUN apk add --no-cache \
     freetype-dev \
     nodejs \
     npm \
-    netcat-openbsd \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-    pdo_mysql \
-    mbstring \
-    zip \
-    gd \
-    opcache
+    netcat-openbsd
+
+# 2. PHP extensions via mlocati installer (precompiled binaries -> seconds, not minutes).
+#    gd picks up freetype/jpeg support automatically from the dev packages installed above.
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo_mysql mbstring zip gd opcache
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy application files
+# 3. Install PHP dependencies cache-first: only re-runs when composer manifests change
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --prefer-dist --no-scripts --no-autoloader
+
+# 4. Install frontend deps cache-first: only re-runs when package manifests change
+COPY package.json package-lock.json ./
+RUN npm install
+
+# 5. Copy application source (only busts the layers below, not the installs above)
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader
+# 6. Finalize composer: regenerate autoloader + run scripts (package:discover, etc.)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Install and build frontend
-RUN npm install && npm run build && rm -rf node_modules
+# 7. Build frontend assets
+RUN npm run build && rm -rf node_modules
 
 # Create storage bootstrap cache and supervisor log directory structure
 RUN mkdir -p storage/framework/cache/data \
