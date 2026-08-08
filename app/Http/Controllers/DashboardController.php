@@ -51,7 +51,7 @@ class DashboardController extends Controller
             ->take(25)
             ->get();
 
-        // Expenses by category for current month (top 10)
+        // Expenses by category for current month (top 5)
         $expensesByCategory = Transaction::select('category_id', DB::raw('SUM(amount) as total'))
             ->with('category')
             ->where('user_id', $user->id)
@@ -60,7 +60,7 @@ class DashboardController extends Controller
             ->whereMonth('transaction_date', substr($month, 5, 2))
             ->groupBy('category_id')
             ->orderBy('total', 'desc')
-            ->take(10)
+            ->take(5)
             ->get();
 
         // Budget progress

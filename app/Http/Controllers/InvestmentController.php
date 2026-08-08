@@ -205,32 +205,34 @@ class InvestmentController extends Controller
         $additionalAmount = (float) $validated['additional_amount'];
         $additionalShares = (float) ($validated['additional_shares'] ?? 0);
 
-        // Update amount_invested
-        $investment->amount_invested = round((float) $investment->amount_invested + $additionalAmount, 2);
+        // Capture beginning values BEFORE any mutation
+        $beginningAmountInvested = (float) $investment->amount_invested;
+        $beginningShares = (float) $investment->shares;
+        $beginningValue = (float) $investment->current_value;
+
+        // Update amount_invested (total capital deployed)
+        $updates = [
+            'amount_invested' => round($beginningAmountInvested + $additionalAmount, 2),
+        ];
 
         // Update shares and recalculate avg_cost
-        if ($additionalShares > 0 && (float) $investment->shares > 0) {
-            $oldShares = (float) $investment->shares;
-            $newShares = $oldShares + $additionalShares;
-            // Recalculate avg_cost: total cost / total shares
-            $investment->avg_cost = round($investment->amount_invested / $newShares, 2);
-            $investment->shares = $newShares;
+        if ($additionalShares > 0 && $beginningShares > 0) {
+            $newShares = $beginningShares + $additionalShares;
+            $updates['shares'] = $newShares;
+            // Average value = (beginning value + top up value) / (beginning shares + top up shares)
+            $updates['avg_cost'] = round(($beginningValue + $additionalAmount) / $newShares, 2);
         } elseif ($additionalShares > 0) {
             // First time shares were set
-            $investment->shares = $additionalShares;
-            $investment->avg_cost = round($additionalAmount / $additionalShares, 2);
+            $updates['shares'] = $additionalShares;
+            $updates['avg_cost'] = round($additionalAmount / $additionalShares, 2);
         }
 
-        // Update current_value if provided
-        if (!empty($validated['new_current_value'])) {
-            $investment->current_value = (float) $validated['new_current_value'];
-        } elseif ($investment->avg_cost && $investment->shares > 0) {
-            $investment->current_value = round((float) $investment->shares * (float) $investment->avg_cost + $additionalAmount, 2);
-        } else {
-            $investment->current_value = round((float) $investment->current_value + $additionalAmount, 2);
-        }
+        // Final value = beginning value + top up value (unless user overrides)
+        $updates['current_value'] = !empty($validated['new_current_value'])
+            ? (float) $validated['new_current_value']
+            : round($beginningValue + $additionalAmount, 2);
 
-        $investment->save();
+        $investment->update($updates);
 
         // Update linked target
         $this->syncTargetAmount($investment);
