@@ -83,11 +83,13 @@
                                         {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                                     </td>
                                     <td class="md-td text-right text-sm whitespace-nowrap">
-                                        <a href="{{ route('transactions.edit', $transaction) }}" class="md-link mr-3">Edit</a>
-                                        <form method="POST" action="{{ route('transactions.destroy', $transaction) }}" class="inline" onsubmit="return confirm('Delete this transaction?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="md-link-danger">Delete</button>
-                                        </form>
+                                        <div class="inline-flex items-center gap-3">
+                                            <a href="{{ route('transactions.edit', $transaction) }}" class="md-link">Edit</a>
+                                            <form method="POST" action="{{ route('transactions.destroy', $transaction) }}" class="inline-flex items-center" onsubmit="return confirm('Delete this transaction?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="md-link-danger">Delete</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

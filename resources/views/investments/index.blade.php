@@ -114,15 +114,17 @@
                                         {{ $investment->return_percentage >= 0 ? '+' : '' }}{{ $investment->return_percentage }}%
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm whitespace-nowrap">
-                                        @if($investment->status === 'active')
-                                            <button onclick="document.getElementById('top-up-{{ $investment->id }}').showModal()" class="text-green-600 hover:text-green-900 mr-2 font-medium">Top Up</button>
-                                            <button onclick="document.getElementById('mark-sold-{{ $investment->id }}').showModal()" class="text-amber-600 hover:text-amber-900 mr-2">Sell</button>
-                                        @endif
-                                        <a href="{{ route('investments.edit', $investment) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</a>
-                                        <form method="POST" action="{{ route('investments.destroy', $investment) }}" class="inline" onsubmit="return confirm('Delete this investment?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                        </form>
+                                        <div class="inline-flex items-center gap-3">
+                                            @if($investment->status === 'active')
+                                                <button onclick="document.getElementById('top-up-{{ $investment->id }}').showModal()" class="text-green-600 hover:text-green-900 font-medium">Top Up</button>
+                                                <button onclick="document.getElementById('mark-sold-{{ $investment->id }}').showModal()" class="text-amber-600 hover:text-amber-900">Sell</button>
+                                            @endif
+                                            <a href="{{ route('investments.edit', $investment) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                            <form method="POST" action="{{ route('investments.destroy', $investment) }}" class="inline-flex items-center" onsubmit="return confirm('Delete this investment?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </form>
+                                        </div>
 
                                         {{-- Target badge --}}
                                         @if($investment->target)

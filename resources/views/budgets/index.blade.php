@@ -122,9 +122,9 @@
                                         <span class="text-sm font-semibold {{ $budget->percentage > 100 ? 'text-red-600' : ($budget->percentage > 75 ? 'text-yellow-600' : 'text-green-600') }}">
                                             {{ $budget->percentage }}%
                                         </span>
-                                        <div class="flex gap-2 mt-1">
+                                        <div class="flex items-center gap-3 mt-1">
                                             <a href="{{ route('budgets.edit', $budget) }}" class="text-xs text-indigo-600 hover:text-indigo-900">Edit</a>
-                                            <form method="POST" action="{{ route('budgets.destroy', $budget) }}" class="inline" onsubmit="return confirm('Delete this budget?')">
+                                            <form method="POST" action="{{ route('budgets.destroy', $budget) }}" class="inline-flex items-center" onsubmit="return confirm('Delete this budget?')">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="text-xs text-red-600 hover:text-red-900">Delete</button>
                                             </form>

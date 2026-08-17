@@ -34,11 +34,11 @@
                                     {{ ucfirst($target->status) }}
                                 </span>
                             </div>
-                            <div class="flex gap-2">
-                                <a href="{{ route('financial-targets.edit', $target) }}" class="text-xs text-indigo-600 hover:text-indigo-900">Edit</a>
-                                <form method="POST" action="{{ route('financial-targets.destroy', $target) }}" class="inline" onsubmit="return confirm('Delete this target?')">
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('financial-targets.edit', $target) }}" class="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-900">Edit</a>
+                                <form method="POST" action="{{ route('financial-targets.destroy', $target) }}" class="inline-flex items-center" onsubmit="return confirm('Delete this target?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="text-xs text-red-600 hover:text-red-900">Delete</button>
+                                    <button type="submit" class="inline-flex items-center text-xs text-red-600 hover:text-red-900">Delete</button>
                                 </form>
                             </div>
                         </div>

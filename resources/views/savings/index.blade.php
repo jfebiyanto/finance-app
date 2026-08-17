@@ -74,13 +74,15 @@
                                     <td class="px-6 py-4 text-sm text-right font-semibold text-emerald-600">Rp {{ number_format($saving->current_value, 0, ',', '.') }}</td>
                                     <td class="px-6 py-4 text-sm text-center text-gray-600">{{ $saving->purchase_date ? $saving->purchase_date->format('d M Y') : '-' }}</td>
                                     <td class="px-6 py-4 text-right text-sm whitespace-nowrap">
-                                        <button onclick="document.getElementById('topup-{{ $saving->id }}').showModal()" class="text-emerald-600 hover:text-emerald-900 mr-2 font-medium">Top Up</button>
-                                        <button onclick="document.getElementById('withdraw-{{ $saving->id }}').showModal()" class="text-amber-600 hover:text-amber-900 mr-2">Withdraw</button>
-                                        <a href="{{ route('savings.edit', $saving) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</a>
-                                        <form method="POST" action="{{ route('savings.destroy', $saving) }}" class="inline" onsubmit="return confirm('Delete this saving?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                        </form>
+                                        <div class="inline-flex items-center gap-3">
+                                            <button onclick="document.getElementById('topup-{{ $saving->id }}').showModal()" class="text-emerald-600 hover:text-emerald-900 font-medium">Top Up</button>
+                                            <button onclick="document.getElementById('withdraw-{{ $saving->id }}').showModal()" class="text-amber-600 hover:text-amber-900">Withdraw</button>
+                                            <a href="{{ route('savings.edit', $saving) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                            <form method="POST" action="{{ route('savings.destroy', $saving) }}" class="inline-flex items-center" onsubmit="return confirm('Delete this saving?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </form>
+                                        </div>
 
                                         {{-- Top Up Dialog --}}
                                         <dialog id="topup-{{ $saving->id }}" class="rounded-xl shadow-xl p-6 w-96">
