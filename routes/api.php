@@ -32,8 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Reference data for clients building a transaction entry form.
         Route::get('/categories', [CategoryController::class, 'index'])->name('api.categories.index');
 
-        // Daily transaction data entry.
+        // Daily transaction data entry (receipt scanning friendly).
         Route::get('/transactions', [TransactionController::class, 'index'])->name('api.transactions.index');
+        Route::post('/transactions/bulk', [TransactionController::class, 'bulk'])->name('api.transactions.bulk');
         Route::post('/transactions', [TransactionController::class, 'store'])->name('api.transactions.store');
     });
 });

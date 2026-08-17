@@ -19,15 +19,29 @@ class StoreTransactionRequest extends FormRequest
     {
         return [
             'category_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists('categories', 'id')->where('user_id', $this->user()?->id),
             ],
-            'type' => ['required', Rule::in(['expense', 'income'])],
+            'category_name' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', Rule::in(['expense', 'income'])],
             'amount' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string', 'max:255'],
             'payee' => ['nullable', 'string', 'max:255'],
-            'transaction_date' => ['required', 'date'],
+            'merchant' => ['nullable', 'string', 'max:255'],
+            'transaction_date' => ['nullable', 'date'],
         ];
+    }
+
+    /**
+     * Ensure category_id and category_name are not both provided.
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->filled('category_id') && $this->filled('category_name')) {
+                $validator->errors()->add('category_name', 'Provide either category_id or category_name, not both.');
+            }
+        });
     }
 }
