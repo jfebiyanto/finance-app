@@ -2,7 +2,7 @@
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex min-w-0">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
@@ -11,7 +11,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-1 sm:-my-px sm:ms-6 sm:flex sm:items-center">
+                <div class="hidden sm:flex sm:items-center sm:ms-3 sm:space-x-1 overflow-x-auto min-w-0 no-scrollbar">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
@@ -40,7 +40,7 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ms-6 shrink-0">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-variant)] transition duration-150 ease-in-out">
@@ -64,6 +64,10 @@
 
                         <x-dropdown-link :href="route('api-tokens.index')">
                             {{ __('API Tokens') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('backup.index')">
+                            {{ __('Database Backup') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -135,6 +139,10 @@
 
                 <x-responsive-nav-link :href="route('api-tokens.index')">
                     {{ __('API Tokens') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('backup.index')">
+                    {{ __('Database Backup') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

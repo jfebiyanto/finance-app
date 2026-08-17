@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiTokenController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -51,6 +52,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
     Route::post('/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
     Route::delete('/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
+
+    // Database Backup
+    Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+    Route::post('/backup/download', [BackupController::class, 'download'])->name('backup.download');
+    Route::post('/backup/email', [BackupController::class, 'email'])->name('backup.email');
 });
 
 Route::middleware('auth')->group(function () {

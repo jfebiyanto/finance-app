@@ -409,6 +409,15 @@
     }
 }
 
+/* Hide horizontal scrollbars on the dense top nav (still scrollable) */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 /* ==========================================================================
    MD3 compatibility layer
    Restyles legacy Tailwind markup (older views/tables/badges) so the whole
