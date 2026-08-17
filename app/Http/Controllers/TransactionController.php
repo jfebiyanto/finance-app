@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Services\TransactionExcelService;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransactionController extends Controller
 {
@@ -67,6 +70,48 @@ class TransactionController extends Controller
 
         return redirect()->route('transactions.index')
             ->with('success', 'Transaction recorded successfully.');
+    }
+
+    /**
+     * Show the Excel import page.
+     */
+    public function importForm()
+    {
+        return view('transactions.import');
+    }
+
+    /**
+     * Download the Excel import template (.xlsx).
+     */
+    public function template(): StreamedResponse
+    {
+        $spreadsheet = app(TransactionExcelService::class)->template(auth()->user());
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, 'transactions_import_template.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    /**
+     * Import transactions from an uploaded Excel/CSV file.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:5120'],
+        ]);
+
+        $result = app(TransactionExcelService::class)->import(
+            auth()->user(),
+            $request->file('file')->getRealPath()
+        );
+
+        return back()
+            ->with('importSuccessCount', count($result['imported']))
+            ->with('importErrors', $result['errors']);
     }
 
     public function edit(Transaction $transaction)

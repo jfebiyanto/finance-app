@@ -24,6 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class);
 
     // Transactions
+    Route::get('/transactions/import', [TransactionController::class, 'importForm'])->name('transactions.import');
+    Route::get('/transactions/template', [TransactionController::class, 'template'])->name('transactions.template');
+    Route::post('/transactions/import', [TransactionController::class, 'import'])->name('transactions.import.store');
     Route::resource('transactions', TransactionController::class);
 
     // Debts

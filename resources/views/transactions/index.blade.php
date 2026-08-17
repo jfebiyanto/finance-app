@@ -2,9 +2,14 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="md-page-title">{{ __('Transactions') }}</h2>
-            <a href="{{ route('transactions.create') }}" class="md-btn md-btn-primary">
-                + Add Transaction
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('transactions.import') }}" class="md-btn md-btn-outlined">
+                    Import
+                </a>
+                <a href="{{ route('transactions.create') }}" class="md-btn md-btn-primary">
+                    + Add Transaction
+                </a>
+            </div>
         </div>
     </x-slot>
 
