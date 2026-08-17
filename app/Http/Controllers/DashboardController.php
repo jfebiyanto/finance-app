@@ -51,7 +51,7 @@ class DashboardController extends Controller
             ->take(25)
             ->get();
 
-        // Expenses by category for current month (top 5)
+        // Expenses by category for current month (top 5 + "Other" for the pie chart)
         $expensesByCategory = Transaction::select('category_id', DB::raw('SUM(amount) as total'))
             ->with('category')
             ->where('user_id', $user->id)
@@ -60,8 +60,9 @@ class DashboardController extends Controller
             ->whereMonth('transaction_date', substr($month, 5, 2))
             ->groupBy('category_id')
             ->orderBy('total', 'desc')
-            ->take(5)
             ->get();
+
+        $categoryChart = $this->buildCategoryChart($expensesByCategory);
 
         // Budget progress
         $budgets = Budget::with('category')
@@ -127,8 +128,43 @@ class DashboardController extends Controller
             'budgets', 'totalDebt', 'totalInvested',
             'totalCurrentValue', 'targets', 'dailyExpenses',
             'monthlyData', 'totalSavingsPrincipal', 'totalSavingsCurrent', 'totalSavingsInterest',
-            'totalTermPrincipal', 'totalTermCurrent', 'termDeposits'
+            'totalTermPrincipal', 'totalTermCurrent', 'termDeposits',
+            'categoryChart'
         ));
+    }
+
+    /**
+     * Build the data structure for the expenses-by-category pie chart:
+     * top 5 categories plus an aggregated "Other" slice.
+     */
+    private function buildCategoryChart($expensesByCategory): array
+    {
+        $top = $expensesByCategory->take(5)->values();
+        $otherTotal = $expensesByCategory->slice(5)->sum('total');
+
+        $palette = ['#6750A4', '#00696D', '#7D5260', '#386A20', '#8B5000', '#B3261E', '#4F378B', '#006A6A'];
+
+        $labels = [];
+        $data = [];
+        $colors = [];
+
+        foreach ($top as $i => $item) {
+            $labels[] = $item->category->name ?? 'Uncategorized';
+            $data[] = (float) $item->total;
+            $colors[] = $item->category->color ?? $palette[$i % count($palette)];
+        }
+
+        if ($otherTotal > 0) {
+            $labels[] = 'Other';
+            $data[] = (float) $otherTotal;
+            $colors[] = $palette[count($labels) % count($palette)];
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+            'colors' => $colors,
+        ];
     }
 
     private function getMonthlyData($user, $monthsBack = 6, $referenceMonth = null)

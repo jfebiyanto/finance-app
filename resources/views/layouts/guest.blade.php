@@ -19,23 +19,23 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
-        <div class="w-full sm:max-w-md mt-6 px-8 py-8 bg-white/95 backdrop-blur-sm shadow-2xl overflow-hidden sm:rounded-2xl">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-[var(--md-sys-color-primary-container)] via-[var(--md-sys-color-surface)] to-[var(--md-sys-color-tertiary-container)]">
+        <div class="w-full sm:max-w-md mt-6 px-8 py-10 md-card overflow-hidden sm:rounded-3xl" style="box-shadow: var(--md-sys-elevation-level3);">
             <div class="flex justify-center mb-6">
                 <a href="/">
                     <x-application-logo class="w-20 h-20" />
                 </a>
             </div>
 
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">{{ __('Welcome') }}</h2>
-            <p class="text-sm text-center text-gray-500 mb-8">{{ __('Manage your finances with ease') }}</p>
+            <h2 class="text-2xl font-bold text-center text-[var(--md-sys-color-on-surface)] mb-2">{{ __('Welcome') }}</h2>
+            <p class="text-sm text-center text-[var(--md-sys-color-on-surface-variant)] mb-8">{{ __('Manage your finances with ease') }}</p>
 
             <div>
                 {{ $slot }}
             </div>
         </div>
 
-        <footer class="w-full sm:max-w-md text-center mt-6 text-gray-400 text-xs">
+        <footer class="w-full sm:max-w-md text-center mt-6 text-[var(--md-sys-color-on-surface-variant)] text-xs">
             <p>&copy; {{ date('Y') }} {{ config('app.name', 'FinanceApp') }}. All rights reserved.</p>
         </footer>
     </div>
